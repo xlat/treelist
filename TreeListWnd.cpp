@@ -1050,6 +1050,12 @@ static void CreateToolTip(TreeListData *pData) {
 	SetWindowLong(pData->hToolTip, GWL_ID, 2);
 	SetWindowLongPtr(pData->hToolTip, GWLP_USERDATA, (LPARAM)pData);
 	SetWindowLongPtr(pData->hToolTip, GWLP_WNDPROC , (LPARAM)ToolProc);
+	//Make a window transparent for Mouse Events :
+	// tip source: https://social.msdn.microsoft.com/Forums/vstudio/en-US/41ca3605-247c-4c5b-ac5d-74ce5abd7b92/making-a-window-invisible-to-mouse-events-ishittestvisiblefalse-not-working?forum=wpf
+	// This is because the tooltip could receive focus and click events which are not
+	// correctly forwarded to the treelist control.
+	int extendedStyle = GetWindowLong(pData->hToolTip, GWL_EXSTYLE);
+	SetWindowLong(pData->hToolTip, GWL_EXSTYLE, extendedStyle | WS_EX_TRANSPARENT);
 }
 
 //*****************************************************************************
@@ -1986,7 +1992,7 @@ static void UpdateToolTip(TreeListData *pData, unsigned uItem, unsigned uFlags) 
 
 					SendMessage(pData->hToolTip, TTM_TRACKPOSITION, 0, MAKELONG(pData->sToolTipPos.x, pData->sToolTipPos.y));
 					SendMessage(pData->hToolTip, TTM_TRACKACTIVATE, 1, (LPARAM)&sInfo);
-
+					
 					LOCK(pData);
 
 					pData->uToolTipItem		= uItem;
